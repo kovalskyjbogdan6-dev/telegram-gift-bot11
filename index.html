@@ -155,3 +155,85 @@
             <span class="text-base">💎</span> <span>Каталог</span>
         </button>
         <button onclick="changeTab('collection')" id="btn-collection" class="py-3 rounded-xl font-bold text-[11px] uppercase tracking-wider flex flex-col items-center justify-center space-y-1 transition">
+                <!-- ... здесь заканчивается весь предыдущий HTML-код кнопок и экранов ... -->
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        const BACKEND_URL = window.location.origin;
+
+        const ITEMS_DATA = [
+            {"id": "4231", "name": "Pudgy Dog", "icon": "🐕", "rarity": "Легендарный", "stars": 500, "ton": "12.5 TON", "desc": "Легендарная собака из коллекции Telegram."},
+            {"id": "1258", "name": "Heart Locket", "icon": "💖", "rarity": "Легендарный", "stars": 350, "ton": "6.8 TON", "desc": "Романтичный подарок, который символизирует любовь."},
+            {"id": "3176", "name": "Rose", "icon": "🌹", "rarity": "Редкий", "stars": 150, "ton": "3.1 TON", "desc": "Прекрасная коллекционная роза с неоновым свечением."},
+            {"id": "2981", "name": "Snowman", "icon": "☃️", "rarity": "Редкий", "stars": 80, "ton": "1.8 TON", "desc": "Новогодний редкий снеговик."}
+        ];
+
+        // ФУНКЦИЯ ПЕРЕНАПРАВЛЕНИЯ НА ВАШ ТЕЛЕГРАМ (Ошибки исправлены)
+        function redirectToAdmin(itemName) {
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            const textMessage = encodeURIComponent(`Привет! Я хочу приобрести/открыть: ${itemName}`);
+            
+            // Здесь ваш ник bogdashqzxc и корректная структура ссылки
+            const adminLink = `https://t.me{textMessage}`;
+            tg.openTelegramLink(adminLink);
+        }
+
+        function changeTab(tabName) {
+            ['cases', 'catalog', 'details', 'collection'].forEach(t => {
+                const screen = document.getElementById(`screen-${t}`);
+                if (screen) screen.classList.add('hidden');
+            });
+            
+            const targetScreen = document.getElementById(`screen-${tabName}`);
+            if (targetScreen) targetScreen.classList.remove('hidden');
+
+            const activeStyle = "text-indigo-400 bg-gradient-to-b from-indigo-950/60 to-indigo-900/30 border border-indigo-500/20 shadow-inner";
+            const inactiveStyle = "text-slate-500 hover:text-slate-300";
+
+            ['cases', 'catalog', 'collection'].forEach(b => {
+                const btn = document.getElementById(`btn-${b}`);
+                if (btn) btn.className = `py-3 rounded-xl font-bold text-[11px] uppercase tracking-wider flex flex-col items-center justify-center space-y-0.5 transition ${tabName === b ? activeStyle : inactiveStyle}`;
+            });
+
+            if (tabName === 'catalog') renderCatalog();
+        }
+
+        // Запуск при старте
+        changeTab('cases');
+
+        function renderCatalog() {
+            const grid = document.getElementById('catalog-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            ITEMS_DATA.forEach(item => {
+                let badgeColor = item.rarity === 'Легендарный' ? 'text-amber-400 bg-amber-500/10 border-amber-500/20' : 'text-purple-400 bg-purple-500/10 border-purple-500/20';
+                const card = document.createElement('div');
+                card.onclick = () => showDetails(item);
+                card.className = "glass-panel rounded-2xl p-4 flex flex-col items-center justify-center space-y-3 text-center active:scale-95 transition cursor-pointer";
+                card.innerHTML = `<span class="text-5xl">${item.icon}</span> <div class="space-y-0.5"> <div class="text-xs font-black text-white truncate max-w-[120px]">${item.name}</div> <div class="text-[10px] font-black text-amber-400">⭐ ${item.stars}</div> <span class="text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${badgeColor} inline-block mt-1">${item.rarity}</span> </div>`;
+                grid.appendChild(card);
+            });
+        }
+
+        function showDetails(item) {
+            document.getElementById('det-id').innerText = `#${item.id}`;
+            document.getElementById('det-icon').innerText = item.icon;
+            document.getElementById('det-name').innerText = item.name;
+            document.getElementById('det-rarity').innerText = item.rarity;
+            document.getElementById('det-stars').innerText = item.stars;
+            document.getElementById('det-ton').innerText = `≈ ${item.ton}`;
+            document.getElementById('det-desc').innerText = item.desc;
+            
+            const buyBtn = document.getElementById('btn-buy-now');
+            if (buyBtn) {
+                buyBtn.onclick = () => redirectToAdmin(`Покупка предмета ${item.name} (#${item.id})`);
+            }
+            changeTab('details');
+        }
+    </script>
+</body>
+</html>
+
