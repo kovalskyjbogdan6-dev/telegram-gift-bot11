@@ -4,132 +4,154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Darikum</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://telegram.org"></script>
+    <script src="https://jsdelivr.net"></script>
     <style>
         body {
-            background: radial-gradient(circle at center, #0f172a, #020617);
+            background: linear-gradient(to bottom, #09122c, #030712);
             color: #f8fafc;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        .glow { filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.6)); }
-        .spin-slow { animation: spin 8s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            backdrop-filter: blur(16px);
+        }
+        .neon-glow {
+            filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.5)) drop-shadow(0 0 40px rgba(168, 85, 247, 0.3));
+        }
+        .glow-text {
+            text-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.5); border-radius: 10px; }
     </style>
 </head>
-<body class="select-none overflow-hidden h-screen flex flex-col justify-between p-4">
+<body class="select-none overflow-hidden h-screen flex flex-col justify-between p-4 pb-5">
 
-    <div id="screen-main" class="flex-1 flex flex-col items-center justify-center space-y-6">
-        <div class="text-center">
-            <h1 class="text-3xl font-extrabold tracking-wider text-blue-400">DARIKUM</h1>
-            <p class="text-xs text-slate-400 mt-1">Удача на твоей стороне</p>
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ С БАЛАНСОМ -->
+    <div id="top-bar" class="flex justify-between items-center w-full px-1 pt-1 pb-3 z-20">
+        <div class="flex items-center space-x-2">
+            <span class="text-2xl">💎</span>
+            <span class="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">DARIKUM</span>
         </div>
-
-        <div id="case-box" class="relative my-8 cursor-pointer transform active:scale-95 transition flex items-center justify-center h-48 w-48" onclick="openCase()">
-            <div class="absolute inset-0 bg-blue-500/10 rounded-full blur-xl spin-slow"></div>
-            <span class="text-8xl glow">🎁</span>
+        <div class="bg-indigo-950/60 border border-indigo-500/30 px-3.5 py-1.5 rounded-full flex items-center space-x-2 backdrop-blur-md">
+            <span class="text-amber-400 font-bold text-xs">⭐</span>
+            <span class="text-xs font-black text-slate-200 tracking-wide">1250</span>
         </div>
-
-        <button onclick="openCase()" class="w-full max-w-xs bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-blue-500/20 transform active:scale-98 transition">
-            Открыть Кейс (100 ⭐)
-        </button>
     </div>
 
-    <div id="screen-animation" class="hidden flex-1 flex flex-col items-center justify-center space-y-6">
-        <div class="relative flex items-center justify-center h-56 w-56">
-            <div class="absolute inset-0 bg-cyan-500/20 rounded-full blur-2xl animate-ping"></div>
-            <span class="text-8xl animate-bounce">📦</span>
-        </div>
-        <h2 class="text-xl font-bold text-cyan-400 animate-pulse">Генерация подарка...</h2>
-    </div>
+    <!-- КОНТЕНТНАЯ ЗОНА -->
+    <div class="flex-1 overflow-y-auto w-full my-auto px-1 flex flex-col justify-start">
+        
+        <!-- ЭКРАН 1: СПИСОК КЕЙСОВ -->
+        <div id="screen-cases" class="w-full space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-black tracking-wide text-indigo-200">Доступные кейсы</h2>
+                <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Удача 100%</span>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-3">
+                <div onclick="redirectToAdmin('Купить Star Case (100 звезд)')" class="glass-panel rounded-2xl p-3 flex flex-col items-center justify-between border border-indigo-500/20 active:scale-95 transition text-center min-h-[135px] cursor-pointer">
+                    <div class="text-[10px] text-slate-400 font-bold truncate w-full">Star Case</div>
+                    <span class="text-4xl my-2 drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">📦</span>
+                    <div class="bg-indigo-950/80 px-2 py-0.5 border border-indigo-500/30 rounded-lg flex items-center space-x-1 text-[11px] font-bold text-amber-400">
+                        <span>⭐</span> <span>100</span>
+                    </div>
+                </div>
 
-    <div id="screen-result" class="hidden flex-1 flex flex-col items-center justify-center space-y-6">
-        <h2 class="text-2xl font-black text-emerald-400">Ты получил подарок!</h2>
-        <div class="bg-slate-900/60 border border-slate-800 rounded-3xl p-8 flex flex-col items-center space-y-4 w-64 shadow-2xl backdrop-blur-md">
-            <span id="result-icon" class="text-7xl glow">🐕</span>
-            <div class="text-center">
-                <div id="result-name" class="font-bold text-lg text-white">Pudgy Dog</div>
-                <div id="result-rarity" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 mt-1 inline-block">Легендарный</div>
+                <div onclick="redirectToAdmin('Купить RGB Capsule (250 звезд)')" class="glass-panel rounded-2xl p-3 flex flex-col items-center justify-between border border-purple-500/20 active:scale-95 transition text-center min-h-[135px] cursor-pointer">
+                    <div class="text-[10px] text-slate-400 font-bold truncate w-full">RGB Capsule</div>
+                    <span class="text-4xl my-2 drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">🧪</span>
+                    <div class="bg-indigo-950/80 px-2 py-0.5 border border-purple-500/30 rounded-lg flex items-center space-x-1 text-[11px] font-bold text-amber-400">
+                        <span>⭐</span> <span>250</span>
+                    </div>
+                </div>
+
+                <div onclick="redirectToAdmin('Купить Premium Case (500 звезд)')" class="glass-panel rounded-2xl p-3 flex flex-col items-center justify-between border border-amber-500/20 active:scale-95 transition text-center min-h-[135px] cursor-pointer">
+                    <div class="text-[10px] text-slate-400 font-bold truncate w-full">Premium Case</div>
+                    <span class="text-4xl my-2 drop-shadow-[0_0_10px_rgba(245,158,11,0.3)]">👑</span>
+                    <div class="bg-indigo-950/80 px-2 py-0.5 border border-amber-500/30 rounded-lg flex items-center space-x-1 text-[11px] font-bold text-amber-400">
+                        <span>⭐</span> <span>500</span>
+                    </div>
+                </div>
             </div>
         </div>
-        <button onclick="showScreen('main')" class="w-full max-w-xs bg-slate-800 hover:bg-slate-700 text-white font-medium py-3 rounded-xl transition">
-            В главное меню
-        </button>
-    </div>
 
-    <div id="screen-collection" class="hidden flex-1 flex flex-col">
-        <h2 class="text-xl font-bold mb-4 text-slate-300">Моя коллекция</h2>
-        <div id="collection-list" class="flex-1 overflow-y-auto grid grid-cols-2 gap-3 pb-4">
+        <!-- ЭКРАН 2: КАТАЛОГ ПОДАРКОВ -->
+        <div id="screen-catalog" class="hidden w-full space-y-4">
+            <div class="relative w-full">
+                <input type="text" placeholder="Поиск подарков..." class="w-full bg-slate-950/80 border border-slate-800 text-sm rounded-xl py-3 pl-10 pr-4 placeholder-slate-600 focus:outline-none">
+                <span class="absolute left-3.5 top-3.5 text-slate-600 text-sm">🔍</span>
+            </div>
+
+            <div class="flex space-x-2 overflow-x-auto pb-1 text-[11px] font-bold">
+                <button class="bg-indigo-600 text-white px-4 py-1.5 rounded-full">Все</button>
+                <button class="bg-slate-900 border border-slate-800 text-amber-400 px-4 py-1.5 rounded-full">Легендарные</button>
+            </div>
+
+            <div id="catalog-grid" class="grid grid-cols-2 gap-3.5 pb-4"></div>
+        </div>
+
+        <!-- ЭКРАН 3: ДЕТАЛИ ПОДАРКА -->
+        <div id="screen-details" class="hidden w-full flex-1 flex flex-col items-center justify-start space-y-5 pt-2">
+            <div class="w-full flex justify-between items-center px-1">
+                <button onclick="changeTab('catalog')" class="text-sm font-bold text-slate-400 hover:text-white flex items-center space-x-1"><span>⬅️</span> <span>Назад</span></button>
+                <span class="text-[10px] text-slate-600 font-mono" id="det-id">#1258</span>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-6 flex flex-col items-center space-y-4 w-full shadow-xl relative overflow-hidden">
+                <span id="det-icon" class="text-7xl neon-glow p-2 bg-indigo-950/40 rounded-2xl border border-indigo-500/10">💖</span>
+                <div class="text-center">
+                    <h3 id="det-name" class="text-xl font-black text-white tracking-wide">Heart Locket</h3>
+                    <span id="det-rarity" class="text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 inline-block mt-1">Легендарный</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 w-full">
+                <div class="glass-panel rounded-2xl p-3.5 space-y-0.5">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Цена в Stars</div>
+                    <div class="text-sm font-black text-amber-400 flex items-center space-x-1">
+                        <span>⭐</span> <span id="det-stars">350</span>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl p-3.5 space-y-0.5">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">На рынке</div>
+                    <div class="text-sm font-black text-white" id="det-ton">≈ 6.8 TON</div>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-4 w-full text-left space-y-2">
+                <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Коллекционность</div>
+                <div class="text-xs font-black text-indigo-400 flex items-center space-x-1">🔥 Высокая</div>
+                <p class="text-xs text-slate-400 leading-relaxed pt-1" id="det-desc">Романтичный подарок, который символизирует любовь и заботу.</p>
+            </div>
+
+            <button id="btn-buy-now" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-sm py-4 rounded-2xl border-t border-blue-400/20 shadow-md">
+                ✨ Купить за Stars
+            </button>
+        </div>
+
+        <!-- ЭКРАН 4: КОЛЛЕКЦИЯ -->
+        <div id="screen-collection" class="hidden w-full space-y-4">
+            <div class="flex justify-between items-center px-1">
+                <div>
+                    <h2 class="text-lg font-black tracking-wide text-white">Моя коллекция</h2>
+                    <p class="text-[10px] text-slate-500">Ваш личный инвентарь наград</p>
+                </div>
+            </div>
+            <div id="collection-list" class="space-y-2.5 pb-4">
+                <div class="glass-panel rounded-2xl p-8 text-center text-slate-500 text-xs">У вас пока нет купленных наград.</div>
+            </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-2 gap-2 bg-slate-900/80 border border-slate-800/50 p-1.5 rounded-2xl backdrop-blur-md">
-        <button onclick="showScreen('main')" id="nav-main" class="py-2.5 rounded-xl font-medium text-sm text-blue-400 bg-slate-800/60 transition">🕹️ Кейсы</button>
-        <button onclick="loadCollection()" id="nav-collection" class="py-2.5 rounded-xl font-medium text-sm text-slate-400 hover:text-slate-200 transition">🎒 Инвентарь</button>
-    </div>
-
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        
-        const BACKEND_URL = window.location.origin; 
-        const initData = tg.initData || "";
-
-        function showScreen(screenName) {
-            ['main', 'animation', 'result', 'collection'].forEach(s => {
-                document.getElementById(`screen-${s}`).classList.add('hidden');
-            });
-            document.getElementById(`screen-${screenName}`).classList.remove('hidden');
-            
-            document.getElementById('nav-main').className = `py-2.5 rounded-xl font-medium text-sm ${screenName === 'main' ? 'text-blue-400 bg-slate-800/60' : 'text-slate-400'}`;
-            document.getElementById('nav-collection').className = `py-2.5 rounded-xl font-medium text-sm ${screenName === 'collection' ? 'text-blue-400 bg-slate-800/60' : 'text-slate-400'}`;
-        }
-
-        async function openCase() {
-            showScreen('animation');
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/open-case`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ init_data: initData })
-                });
-                const data = await response.json();
-                setTimeout(() => {
-                    document.getElementById('result-icon').innerText = data.icon;
-                    document.getElementById('result-name').innerText = data.name;
-                    document.getElementById('result-rarity').innerText = data.rarity;
-                    showScreen('result');
-                    if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                }, 2000);
-            } catch (err) {
-                console.error(err);
-                showScreen('main');
-                alert("Ошибка соединения с сервером.");
-            }
-        }
-
-        async function loadCollection() {
-            showScreen('collection');
-            const list = document.getElementById('collection-list');
-            list.innerHTML = '<div class="col-span-2 text-center text-slate-500 py-8">Загрузка...</div>';
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/collection?init_data=${encodeURIComponent(initData)}`);
-                const items = await response.json();
-                list.innerHTML = '';
-                if (items.length === 0) {
-                    list.innerHTML = '<div class="col-span-2 text-center text-slate-500 py-8">У вас пока нет подарков</div>';
-                    return;
-                }
-                items.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = "bg-slate-900/40 border border-slate-800/60 rounded-2xl p-4 flex flex-col items-center justify-center space-y-2 text-center";
-                    card.innerHTML = `<span class="text-4xl">${item.icon}</span><div class="text-sm font-bold text-white">${item.name}</div><span class="text-[10px] text-slate-400">${item.rarity}</span>`;
-                    list.appendChild(card);
-                });
-            } catch (err) {
-                list.innerHTML = '<div class="col-span-2 text-center text-red-400 py-8">Не удалось загрузить инвентарь</div>';
-            }
-        }
-    </script>
-</body>
-</html>
+    <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+    <div id="bottom-nav" class="grid grid-cols-3 gap-2 bg-slate-950/80 border border-slate-900/60 p-1.5 rounded-2xl backdrop-blur-xl shadow-2xl z-20">
+        <button onclick="changeTab('cases')" id="btn-cases" class="py-3 rounded-xl font-bold text-[11px] uppercase tracking-wider flex flex-col items-center justify-center space-y-1 transition">
+            <span class="text-base">🕹️</span> <span>Кейсы</span>
+        </button>
+        <button onclick="changeTab('catalog')" id="btn-catalog" class="py-3 rounded-xl font-bold text-[11px] uppercase tracking-wider flex flex-col items-center justify-center space-y-1 transition">
+            <span class="text-base">💎</span> <span>Каталог</span>
+        </button>
+        <button onclick="changeTab('collection')" id="btn-collection" class="py-3 rounded-xl font-bold text-[11px] uppercase tracking-wider flex flex-col items-center justify-center space-y-1 transition">
